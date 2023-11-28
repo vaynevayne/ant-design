@@ -1,15 +1,16 @@
+import * as React from 'react';
 import ExclamationCircleFilled from '@ant-design/icons/ExclamationCircleFilled';
 import classNames from 'classnames';
-import KeyCode from 'rc-util/lib/KeyCode';
 import useMergedState from 'rc-util/lib/hooks/useMergedState';
+import KeyCode from 'rc-util/lib/KeyCode';
 import omit from 'rc-util/lib/omit';
-import * as React from 'react';
+
 import type { RenderFunction } from '../_util/getRenderPropValue';
 import { cloneElement } from '../_util/reactNode';
 import type { ButtonProps, LegacyButtonType } from '../button/button';
 import { ConfigContext } from '../config-provider';
 import Popover from '../popover';
-import type { AbstractTooltipProps } from '../tooltip';
+import type { AbstractTooltipProps, TooltipRef } from '../tooltip';
 import PurePanel, { Overlay } from './PurePanel';
 import usePopconfirmStyle from './style';
 
@@ -37,7 +38,7 @@ export interface PopconfirmState {
   open?: boolean;
 }
 
-const Popconfirm = React.forwardRef<unknown, PopconfirmProps>((props, ref) => {
+const Popconfirm = React.forwardRef<TooltipRef, PopconfirmProps>((props, ref) => {
   const {
     prefixCls: customizePrefixCls,
     placement = 'top',
@@ -53,11 +54,9 @@ const Popconfirm = React.forwardRef<unknown, PopconfirmProps>((props, ref) => {
 
   const { getPrefixCls } = React.useContext(ConfigContext);
   const [open, setOpen] = useMergedState(false, {
-    value: props.open,
-    defaultValue: props.defaultOpen,
+    value: props.open ?? props.visible,
+    defaultValue: props.defaultOpen ?? props.defaultVisible,
   });
-
-  // const isDestroyed = useDestroyed();
 
   const settingOpen = (
     value: boolean,

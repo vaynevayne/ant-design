@@ -38,13 +38,15 @@ return <Breadcrumb routes={[{ breadcrumbName: 'sample' }]} />;
 <!-- prettier-ignore -->
 <code src="./demo/basic.tsx">基本</code>
 <code src="./demo/withIcon.tsx">带有图标的</code>
-<code src="./demo/react-router.tsx" iframe="200">react-router V6</code>
 <code src="./demo/separator.tsx">分隔符</code>
 <code src="./demo/overlay.tsx">带下拉菜单的面包屑</code>
 <code src="./demo/separator-component.tsx">独立的分隔符</code>
 <code src="./demo/debug-routes.tsx">Debug Routes</code>
+<code src="./demo/component-token.tsx" debug>组件 Token</code>
 
 ## API
+
+通用属性参考：[通用属性](/docs/react/common-props)
 
 ### Breadcrumb
 
@@ -128,6 +130,6 @@ function itemRender(item, params, items, paths) {
 return <Breadcrumb itemRender={itemRender} items={items} />;
 ```
 
-## Design Token
+## 主题变量（Design Token）
 
 <ComponentTokenTable component="Breadcrumb"></ComponentTokenTable>

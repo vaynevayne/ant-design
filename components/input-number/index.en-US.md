@@ -34,14 +34,18 @@ When a numeric value needs to be provided.
 
 ## API
 
+Common props ref：[Common props](/docs/react/common-props)
+
 | Property | Description | Type | Default | Version |
 | --- | --- | --- | --- | --- |
 | addonAfter | The label text displayed after (on the right side of) the input field | ReactNode | - |  |
 | addonBefore | The label text displayed before (on the left side of) the input field | ReactNode | - |  |
 | autoFocus | If get focus when component mounted | boolean | false | - |
 | bordered | Whether has border style | boolean | true | 4.12.0 |
+| changeOnBlur | Trigger `onChange` when blur. e.g. reset value in range by blur | boolean | true | 5.11.0 |
 | controls | Whether to show `+-` controls, or set custom arrows icon | boolean \| { upIcon?: React.ReactNode; downIcon?: React.ReactNode; } | - | 4.19.0 |
 | decimalSeparator | Decimal separator | string | - | - |
+| placeholder | placeholder | string | - |  |
 | defaultValue | The initial value | number | - | - |
 | disabled | If disable the input | boolean | false | - |
 | formatter | Specifies the format of the value presented | function(value: number \| string, info: { userTyping: boolean, input: string }): string | - | info: 4.17.0 |
@@ -85,3 +89,7 @@ Developer handle data by their own in control. It will make data out of sync if 
 ### Why dynamic change `min` or `max` which makes `value` out of range will not trigger `onChange`?
 
 `onChange` is user trigger event. Auto trigger will makes form lib can not detect data modify source.
+
+### Why `onBlur` or other event can not get correct value?
+
+InputNumber's value is wrapped by internal logic. The `event.target.value` you get from `onBlur` or other event is the DOM element's `value` instead of the actual value of InputNumber. For example, if you change the display format through `formatter` or `decimalSeparator`, you will get the formatted string in the DOM. You should always get the current value through `onChange`.

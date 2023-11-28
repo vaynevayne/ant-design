@@ -8,17 +8,22 @@ import type { Options } from 'scroll-into-view-if-needed';
 import { ConfigContext } from '../config-provider';
 import DisabledContext, { DisabledContextProvider } from '../config-provider/DisabledContext';
 import type { SizeType } from '../config-provider/SizeContext';
-import { SizeContextProvider } from '../config-provider/SizeContext';
+import SizeContext from '../config-provider/SizeContext';
 import useSize from '../config-provider/hooks/useSize';
 import type { ColProps } from '../grid/col';
 import type { FormContextProps } from './context';
-import { FormContext, FormProvider, ValidateMessagesContext } from './context';
+import { FormContext, FormProvider } from './context';
 import useForm, { type FormInstance } from './hooks/useForm';
 import useFormWarning from './hooks/useFormWarning';
 import type { FormLabelAlign } from './interface';
 import useStyle from './style';
+import ValidateMessagesContext from './validateMessagesContext';
+import type { FeedbackIcons } from './FormItem';
 
-export type RequiredMark = boolean | 'optional';
+export type RequiredMark =
+  | boolean
+  | 'optional'
+  | ((labelNode: React.ReactNode, info: { required: boolean }) => React.ReactNode);
 export type FormLayout = 'horizontal' | 'inline' | 'vertical';
 
 export interface FormProps<Values = any> extends Omit<RcFormProps<Values>, 'form'> {
@@ -31,6 +36,7 @@ export interface FormProps<Values = any> extends Omit<RcFormProps<Values>, 'form
   labelCol?: ColProps;
   wrapperCol?: ColProps;
   form?: FormInstance<Values>;
+  feedbackIcons?: FeedbackIcons;
   size?: SizeType;
   disabled?: boolean;
   scrollToFirstError?: Options | boolean;
@@ -62,6 +68,8 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
     requiredMark,
     onFinishFailed,
     name,
+    style,
+    feedbackIcons,
     ...restFormProps
   } = props;
 
@@ -99,13 +107,14 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
 
   const formClassName = classNames(
     prefixCls,
+    `${prefixCls}-${layout}`,
     {
-      [`${prefixCls}-${layout}`]: true,
       [`${prefixCls}-hide-required-mark`]: mergedRequiredMark === false,
       [`${prefixCls}-rtl`]: direction === 'rtl',
       [`${prefixCls}-${mergedSize}`]: mergedSize,
     },
     hashId,
+    contextForm?.className,
     className,
     rootClassName,
   );
@@ -126,8 +135,19 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
       requiredMark: mergedRequiredMark,
       itemRef: __INTERNAL__.itemRef,
       form: wrapForm,
+      feedbackIcons,
     }),
-    [name, labelAlign, labelCol, wrapperCol, layout, mergedColon, mergedRequiredMark, wrapForm],
+    [
+      name,
+      labelAlign,
+      labelCol,
+      wrapperCol,
+      layout,
+      mergedColon,
+      mergedRequiredMark,
+      wrapForm,
+      feedbackIcons,
+    ],
   );
 
   React.useImperativeHandle(ref, () => wrapForm);
@@ -159,7 +179,7 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
 
   return wrapSSR(
     <DisabledContextProvider disabled={disabled}>
-      <SizeContextProvider size={mergedSize}>
+      <SizeContext.Provider value={mergedSize}>
         <FormProvider
           {...{
             // This is not list in API, we pass with spread
@@ -173,19 +193,24 @@ const InternalForm: React.ForwardRefRenderFunction<FormInstance, FormProps> = (p
               name={name}
               onFinishFailed={onInternalFinishFailed}
               form={wrapForm}
+              style={{ ...contextForm?.style, ...style }}
               className={formClassName}
             />
           </FormContext.Provider>
         </FormProvider>
-      </SizeContextProvider>
+      </SizeContext.Provider>
     </DisabledContextProvider>,
   );
 };
 
-const Form = React.forwardRef<FormInstance, FormProps>(InternalForm) as <Values = any>(
+const Form = React.forwardRef<FormInstance, FormProps>(InternalForm) as (<Values = any>(
   props: React.PropsWithChildren<FormProps<Values>> & { ref?: React.Ref<FormInstance<Values>> },
-) => React.ReactElement;
+) => React.ReactElement) & { displayName?: string };
 
-export { useForm, List, type FormInstance, useWatch };
+if (process.env.NODE_ENV !== 'production') {
+  Form.displayName = 'Form';
+}
+
+export { List, useForm, useWatch, type FormInstance };
 
 export default Form;

@@ -11,6 +11,12 @@ export enum ColorFormat {
 export interface PresetsItem {
   label: ReactNode;
   colors: (string | Color)[];
+  /**
+   * Whether the initial state is collapsed
+   * @since 5.11.0
+   * @default true
+   */
+  defaultOpen?: boolean;
 }
 export type TriggerType = 'click' | 'hover';
 
@@ -28,6 +34,11 @@ export interface ColorPickerBaseProps {
   allowClear?: boolean;
   colorCleared?: boolean;
   disabled?: boolean;
+  disabledAlpha?: boolean;
   presets?: PresetsItem[];
+  panelRender?: ColorPickerProps['panelRender'];
   onFormatChange?: ColorPickerProps['onFormatChange'];
+  onChangeComplete?: ColorPickerProps['onChangeComplete'];
 }
+
+export type ColorValueType = Color | string | null;

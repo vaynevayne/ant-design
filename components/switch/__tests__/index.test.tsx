@@ -23,6 +23,11 @@ describe('Switch', () => {
     act(() => {
       jest.advanceTimersByTime(100);
     });
+
+    // Second time for raf to render wave effect
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
     expect(document.querySelector('.ant-wave')).toBeTruthy();
     jest.clearAllTimers();
     jest.useRealTimers();
@@ -38,5 +43,9 @@ describe('Switch', () => {
       'Warning: [antd: Switch] `value` is not a valid prop, do you mean `checked`?',
     );
     errorSpy.mockRestore();
+  });
+
+  it('have static property for type detecting', () => {
+    expect(Switch.__ANT_SWITCH).toBeTruthy();
   });
 });
